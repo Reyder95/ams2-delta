@@ -3,7 +3,7 @@
 An Electron application with React and TypeScript. Still **WIP**.
 
 ## Overview
-*Delta* is an application designed to help improve driver's skills before they go online. It uses [CREST2-AMS2](https://github.com/viper4gh/CREST2-AMS2) to pull data and accurately record races as you run them. 
+*Delta* is an application designed to help improve driver's skills before they go online in the game Automobillista 2. It uses [CREST2-AMS2](https://github.com/viper4gh/CREST2-AMS2) to pull data and accurately record races as you run them. 
 
 As you race, your driver difficulty will adjust based on your current rating. As you finish races, they will automatically be recorded into the system locally, but you'll also have full control of modifying them.
 
