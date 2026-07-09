@@ -98,9 +98,13 @@ function App(): React.JSX.Element {
     // Current Race Data
     if (updatedRaceData.mSessionState == SessionStateValues.SESSION_RACE && updatedRaceData.mRaceState == RaceStateValues.RACESTATE_RACING)
     {
-      setPlayerParticipantIndex(updatedRaceData.mViewedParticipantIndex)
-      setRaceInformation({id: crypto.randomUUID()});
-      setIsRacing(true)
+      if (!isRacing)
+      {
+        setPlayerParticipantIndex(updatedRaceData.mViewedParticipantIndex)
+        setRaceInformation({id: crypto.randomUUID()});
+        setIsRacing(true)
+      }
+
     }
     else
     {
@@ -129,8 +133,6 @@ function App(): React.JSX.Element {
       let calculatedRatingChange = calculateRatingChange(playerRating, currStrength, position, numOpponents);
 
       if (currProfile && currProfile.id && raceInformation) {
-        console.log("Rating Changed By: " + calculatedRatingChange)
-        console.log("Data snapshot: ", currData);
         let tempProfile = {...currProfile};
         tempProfile.driverRating += calculatedRatingChange;
         setCurrProfile(tempProfile)
@@ -155,7 +157,7 @@ function App(): React.JSX.Element {
 
         if (tempRaceHistory[currProfile.id])
         {
-          tempRaceHistory[currProfile.id].push(tempRaceInformation);
+          tempRaceHistory[currProfile.id] = [...tempRaceHistory[currProfile.id], tempRaceInformation]
         }
         else
         {
