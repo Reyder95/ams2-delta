@@ -15,6 +15,11 @@ You can set up races in any fashion, and drive races to your heart's content, it
 
 ## Phase 2
 
+Eventually will be turned into my own application involving custom series using Automobillista 2's content, with support for custom series.
+
+Think of *iRacing Lite* where you will have seasons, and a bunch of series, and have to work up from Rookies to A class or Pro class.
+
+This will also be optional as you'll be able to download the application with or without the series part of it.
 
 ## Recommended IDE Setup
 
