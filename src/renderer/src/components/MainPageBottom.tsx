@@ -2,7 +2,7 @@ import { useState } from "react";
 import Toggle from "./Toggle";
 import { Bot } from "lucide-react";
 import LabeledSlider from "./LabeledSlider";
-import { ratingToStrength, returnRatingInformation } from "@renderer/utils/helpers";
+import { ratingToStrength, returnRatingInformation, returnSafetyRatingInformation } from "@renderer/utils/helpers";
 import { Profile } from "@renderer/utils/interfaces";
 
 interface MainPageBottomProps {
@@ -39,11 +39,13 @@ export function MainPageBottom(props: MainPageBottomProps) {
                 </div>
 
                 <div className="relative group w-25 flex items-center gap-2 bg-background p-2 rounded-md">
-                    <div className="font-bold text-red-500">A</div>
+                    <div style={{
+                        color: `${returnSafetyRatingInformation(props.profile.safetyRating).ratingColor}`
+                    }} className="font-bold">{returnSafetyRatingInformation(props.profile.safetyRating).ratingLetter}</div>
                     <div><h1 className="font-semibold">{props.profile.safetyRating}</h1></div>
                 </div>
             </div>
-            <div className="gap-5 absolute bottom-25 right-0 bg-surface w-125 h-25 flex flex-wrap justify-center place-items-center p-5">
+            <div className="z-10 gap-5 absolute bottom-25 right-0 bg-surface w-125 h-25 flex flex-wrap justify-center place-items-center p-5">
                 <LabeledSlider 
                     min={75}
                     max={120}

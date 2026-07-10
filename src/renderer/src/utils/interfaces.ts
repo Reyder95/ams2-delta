@@ -24,10 +24,11 @@ export interface RaceData {
   mLastOpponentCollisionMagnitude: number;
   mTranslatedTrackLocation: string;
   mTranslatedTrackVariation: string;
+  mCrashState: number;
 }
 
 export interface IncidentInformation {
-  numOfftrack: number;
+  numOffTrack: number;
   numBigCollision: number;
   numSmallCollision: number;
   numSpins: number;
@@ -54,6 +55,11 @@ export interface RaceRecord {
 export interface RatingInformation {
     ratingName: string;
     ratingColor: string;
+}
+
+export interface SafetyInformation {
+  ratingLetter: string;
+  ratingColor: string;
 }
 
 export interface Profile {

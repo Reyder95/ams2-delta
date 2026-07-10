@@ -27,7 +27,7 @@ export default function ProfileCreation() {
                 id: userId,
                 name: profileName,
                 driverRating: 1350,
-                safetyRating: 2.50
+                safetyRating: 1.50
             }
             const updatedProfiles = [...profiles, newProfile]
             setProfiles(updatedProfiles)
