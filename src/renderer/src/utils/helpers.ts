@@ -136,17 +136,18 @@ export function calculateSafetyDelta(
     weightedIncidents: number,
     laps: number,
     currentSR: number,
-    targetRate: number = 0.10,
-    k: number = 0.4
+    k: number = 0.2
 ): number {
+    const safetyInfo = returnSafetyRatingInformation(currentSR);
+
     const actualRate = weightedIncidents / laps;
-    const diff = targetRate - actualRate;
+    const diff = safetyInfo.incidentCount - actualRate;
 
     if (diff >= 0) {
         return k * diff;
     }
 
-    const severityMultiplier = 1 * currentSR / 6;
+    const severityMultiplier = 1 * currentSR / 3;
     
     return k * diff * severityMultiplier;
 }
@@ -154,16 +155,16 @@ export function calculateSafetyDelta(
 export function returnSafetyRatingInformation(rating: number): SafetyInformation {
     switch (true) {
         case rating < 2.0:
-            return { ratingLetter: "R", ratingColor: '#8983A3' };
+            return { ratingLetter: "R", ratingColor: '#8983A3', incidentCount: 1 };
         case rating < 3.0:
-            return { ratingLetter: "D", ratingColor: "#E8763C" };
+            return { ratingLetter: "D", ratingColor: "#E8763C", incidentCount: 0.9 };
         case rating < 4.0:
-            return { ratingLetter: "C", ratingColor: "#E8B23C" };
+            return { ratingLetter: "C", ratingColor: "#E8B23C", incidentCount: 0.8 };
         case rating < 5.0:
-            return { ratingLetter: "B", ratingColor: "#D4D43C" };
+            return { ratingLetter: "B", ratingColor: "#D4D43C", incidentCount: 0.6 };
         case rating < 6.0:
-            return { ratingLetter: "A", ratingColor: "#5FD467" };
+            return { ratingLetter: "A", ratingColor: "#5FD467", incidentCount: 0.4 };
         default:
-            return { ratingLetter: "S", ratingColor: "#4FE0D4" };
+            return { ratingLetter: "S", ratingColor: "#4FE0D4", incidentCount: 0.2 };
     }
 }

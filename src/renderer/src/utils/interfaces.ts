@@ -60,6 +60,7 @@ export interface RatingInformation {
 export interface SafetyInformation {
   ratingLetter: string;
   ratingColor: string;
+  incidentCount: number;
 }
 
 export interface Profile {

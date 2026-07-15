@@ -13,11 +13,11 @@ interface MainPageProps {
 
 export function MainPage(props: MainPageProps) {
     return (
-        <div className="relative h-screen">
+        <div className="relative h-screen overflow-hidden">
             {props.profile && props.profile.id && (
                 <div className="overflow-hidden">
                     <MainPageBottom currStrength={props.currStrength} setCurrStrength={props.setCurrStrength} recording={props.recording} setRecording={props.setRecording} profile={props.profile}/>
-                    <div className="mt-15">
+                    <div className="mt-15 overflow-scroll">
                         <RaceHistoryList raceArray={props.raceHistory[props.profile.id] ? props.raceHistory[props.profile.id] : []} />
                     </div>
 

@@ -17,7 +17,7 @@ export function MainPageBottom(props: MainPageBottomProps) {
 
     return (
         <div>
-            <div className="absolute bottom-0 bg-surface w-125 h-25 gap-10 flex flex-wrap justify-center place-items-center p-5">
+            <div className="z-10 absolute bottom-0 bg-surface w-125 h-25 gap-10 flex flex-wrap justify-center place-items-center p-5">
                 <div className="flex flex-grid place-items-center">
                 <div className="w-12 h-12 mr-3 rounded-full overflow-hidden">
                     <img
@@ -62,7 +62,7 @@ export function MainPageBottom(props: MainPageBottomProps) {
                     </span>
                 </div>
             </div>
-            <div className="absolute bottom-0 right-0 bg-surface w-125 h-25 gap-25 flex flex-wrap justify-center place-items-center p-5">
+            <div className="z-10 absolute bottom-0 right-0 bg-surface w-125 h-25 gap-25 flex flex-wrap justify-center place-items-center p-5">
                 <Toggle checked={props.recording} onChange={props.setRecording} label="Record Races" />
                 <div className="relative group flex items-center gap-2 p-2 rounded-md">
                     <div className="flex flex-wrap gap-3 cursor-pointer bg-accent p-2 rounded-lg">
