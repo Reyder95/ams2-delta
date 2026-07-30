@@ -24,7 +24,7 @@ export default function LabeledSlider({
     }
 
     return (
-        <div className="w-1/2 p-6 bg-neutral-900 rounded-2xl">
+        <div className="w-50 p-3 bg-neutral-900 rounded-sm">
             <div className="relative h-2 flex items-center">
                 <div className="absolute w-full h-2 rounded-full bg-neutral-700"/>
 

@@ -45,7 +45,7 @@ export function MainPageBottom(props: MainPageBottomProps) {
                     <div><h1 className="font-semibold">{props.profile.safetyRating}</h1></div>
                 </div>
             </div>
-            <div className="z-10 gap-5 absolute bottom-25 right-0 bg-surface w-125 h-25 flex flex-wrap justify-center place-items-center p-5">
+            {/* <div className="z-10 gap-5 absolute bottom-25 right-0 bg-surface w-125 h-25 flex flex-wrap justify-center place-items-center p-5">
                 <LabeledSlider 
                     min={75}
                     max={120}
@@ -61,19 +61,36 @@ export function MainPageBottom(props: MainPageBottomProps) {
                         Current AI Strength (in-game)
                     </span>
                 </div>
-            </div>
-            <div className="z-10 absolute bottom-0 right-0 bg-surface w-125 h-25 gap-25 flex flex-wrap justify-center place-items-center p-5">
-                <Toggle checked={props.recording} onChange={props.setRecording} label="Record Races" />
-                <div className="relative group flex items-center gap-2 p-2 rounded-md">
-                    <div className="flex flex-wrap gap-3 cursor-pointer bg-accent p-2 rounded-lg">
-                        <Bot/>
-                        <p className="font-bold text-lg">{ratingToStrength(props.profile.driverRating)}%</p>
-                    </div>
-                    <span className="duration-300 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 invisible group-hover:opacity-100 group-hover: visible transition-opacity delay-100 duration-200">
-                        Suggested AI Strength
-                    </span>
-                </div>
-            </div>
+            </div> */}
+<div className="z-10 absolute bottom-0 right-0 bg-surface w-125 h-25 grid grid-cols-3 items-center p-5">
+
+    <div className="relative group flex items-center gap-2 p-2 rounded-md justify-self-start">
+<div className="flex flex-wrap cursor-pointer">
+    <Toggle checked={props.recording} onChange={props.setRecording} />
+</div>
+<span className="duration-300 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity delay-100 duration-200">
+    Toggle Recording
+</span>
+    </div>
+
+    <div className="justify-self-center">
+        <LabeledSlider 
+            min={75}
+            max={120}
+            initialValue={props.currStrength}
+            onChange={(value) => props.setCurrStrength(value)}
+        />
+    </div>
+
+    <div className="relative group flex items-center gap-2 p-2 rounded-md justify-self-end">
+        <div className="flex flex-wrap cursor-pointer">
+            <p className="text-lg text-muted">{props.currStrength}% | {ratingToStrength(props.profile.driverRating)}%</p>
+        </div>
+        <span className="duration-300 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity delay-100 duration-200">
+            AI Strength
+        </span>
+    </div>
+</div>
         </div>
 
     )
