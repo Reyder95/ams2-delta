@@ -17,7 +17,7 @@ export function MainPage(props: MainPageProps) {
             {props.profile && props.profile.id && (
                 <div className="overflow-hidden">
                     <MainPageBottom currStrength={props.currStrength} setCurrStrength={props.setCurrStrength} recording={props.recording} setRecording={props.setRecording} profile={props.profile}/>
-                    <div className="mt-15 overflow-scroll">
+                    <div className="mt-15 overflow-y-scroll max-h-125">
                         <RaceHistoryList raceArray={props.raceHistory[props.profile.id] ? props.raceHistory[props.profile.id] : []} />
                     </div>
 
