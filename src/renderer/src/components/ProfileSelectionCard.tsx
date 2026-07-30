@@ -1,4 +1,4 @@
-import { returnRatingInformation } from "@renderer/utils/helpers";
+import { returnRatingInformation, returnSafetyRatingInformation } from "@renderer/utils/helpers";
 import { Plus, Trash2 } from "lucide-react"
 import { useNavigate } from "react-router-dom";
 
@@ -43,7 +43,7 @@ function EmptyProfile() {
 
 function ExistingProfile(props: ProfileDetails) {
 
-    if (!props.driverRating)
+    if (!props.driverRating || !props.safetyRating)
         return;
     return (
         <div className="flex flex-col items-center">
@@ -69,7 +69,9 @@ function ExistingProfile(props: ProfileDetails) {
             </div>
 
             <div className="relative group w-25 mt-2 flex items-center gap-2 bg-background p-2 rounded-md">
-                <div className="font-bold text-red-500">A</div>
+                <div style={{
+                    color: `${returnSafetyRatingInformation(props.safetyRating).ratingColor}`
+                }} className={`font-bold`}>{returnSafetyRatingInformation(props.safetyRating).ratingLetter}</div>
                 <div><h1 className="font-semibold">{props.safetyRating}</h1></div>
             </div>
             </div>

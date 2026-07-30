@@ -5,8 +5,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { MainPage } from "./pages/MainPage"
 import { ParticipantInfo, useTelemetry } from "./hooks/useTelemetry"
-import { RaceStateValues, SessionStateValues } from "./utils/enums"
-import { calculateRatingChange, groupAndSortByClass, loadRaceHistory, returnClassPositionByRacePosition, saveRaceHistory, saveSingleProfile, saveSingleRace, strengthToRating } from "./utils/helpers"
+import { CrashStateValues, RaceStateValues, SessionStateValues } from "./utils/enums"
+import { calculateRatingChange, calculateSafetyDelta, groupAndSortByClass, loadRaceHistory, returnClassPositionByRacePosition, saveRaceHistory, saveSingleProfile, saveSingleRace, strengthToRating } from "./utils/helpers"
 import { Profile, RaceData, RaceRecord } from "./utils/interfaces"
 
 function App(): React.JSX.Element {
@@ -17,7 +17,7 @@ function App(): React.JSX.Element {
   const [maxHistory, setMaxHistory] = useState<number>(0);
 
   const [currProfile, setCurrProfile] = useState<Profile>();
-  const gameInfo = useTelemetry(['gameStates', 'participants', 'carState', 'wheelsAndTyres', 'vehicleInformation', 'eventInformation'], 500);
+  const gameInfo = useTelemetry(['gameStates', 'participants', 'carState', 'wheelsAndTyres', 'vehicleInformation', 'eventInformation', 'carDamage'], 500);
   const [currData, setCurrData] = useState<RaceData>();
   const [raceInformation, setRaceInformation] = useState<RaceRecord>();
 
@@ -57,11 +57,13 @@ function App(): React.JSX.Element {
   const canGoForward = historyIndex < maxHistory;
   const canGoBackward = historyIndex !== 0;
 
+  // Gets run every "poll" of the data. 2 times a second.
   useEffect(() => {
 
     if (gameInfo.data == null)
       return;
 
+    // Up-to-date race data. currData becomes the data from the previous tick. This way we can compare
     let updatedRaceData: RaceData = {
       mGameState: gameInfo.data.gameStates.mGameState,
       mRaceState: gameInfo.data.gameStates.mRaceState,
@@ -72,16 +74,23 @@ function App(): React.JSX.Element {
       mLastOpponentCollisionIndex: gameInfo.data.carState.mLastOpponentCollisionIndex,
       mLastOpponentCollisionMagnitude: gameInfo.data.carState.mLastOpponentCollisionMagnitude,
       mTranslatedTrackLocation: gameInfo.data.eventInformation.mTranslatedTrackLocation,
-      mTranslatedTrackVariation: gameInfo.data.eventInformation.mTranslatedTrackVariation
+      mTranslatedTrackVariation: gameInfo.data.eventInformation.mTranslatedTrackVariation,
+      mCrashState: gameInfo.data.carDamage.mCrashState
     }
 
     if (updatedRaceData.mViewedParticipantIndex != -1)
       setPlayerParticipantIndex(updatedRaceData.mViewedParticipantIndex)
 
+    // If we're racing and have all info required, do things in the tick. 
     if (raceInformation && currData && isRacing && playerParticipantIndex != -1) {
       let currPlayer: ParticipantInfo = updatedRaceData.participants[playerParticipantIndex];
-      let prevPlayer: ParticipantInfo = currData.participants[playerParticipantIndex];
+      let currCrashState: CrashStateValues = updatedRaceData.mCrashState;
+      let currCollisionMagnitude: number = updatedRaceData.mLastOpponentCollisionMagnitude;
 
+      let prevPlayer: ParticipantInfo = currData.participants[playerParticipantIndex];
+      let prevCrashState: CrashStateValues = currData.mCrashState;
+      let prevCollisionMagnitude: number = currData.mLastOpponentCollisionMagnitude;
+      
       let tempRaceInformation = {...raceInformation}
 
       if (currPlayer.mCurrentLap != prevPlayer.mCurrentLap && currPlayer.mCurrentLap > 1) {
@@ -92,6 +101,38 @@ function App(): React.JSX.Element {
         }
       }
 
+      if (tempRaceInformation.incidentInformation)
+      {
+        if (prevCrashState != currCrashState) {
+          switch (currCrashState) {
+            case CrashStateValues.OFFTRACK:
+              tempRaceInformation.incidentInformation.numOffTrack += 1;
+              console.log("OFF TRACK");
+              break;
+            case CrashStateValues.SPINNING:
+              tempRaceInformation.incidentInformation.numSpins += 1;
+              console.log("SPINNING");
+              break;
+            case CrashStateValues.LARGE_PROP:
+              tempRaceInformation.incidentInformation.numBigCollision += 1;
+              console.log("LARGE PROP");
+              break;
+          }
+        }
+        if (prevCollisionMagnitude != currCollisionMagnitude) {
+          if (currCollisionMagnitude >= 0.23)
+          {
+            tempRaceInformation.incidentInformation.numBigCollision += 1;
+            console.log("LARGE COLLISION")
+          }
+          else {
+            tempRaceInformation.incidentInformation.numSmallCollision += 1;
+            console.log("SMALL COLLISION")
+          }
+        }
+      }
+
+
       setRaceInformation(tempRaceInformation)
     }
 
@@ -101,7 +142,15 @@ function App(): React.JSX.Element {
       if (!isRacing)
       {
         setPlayerParticipantIndex(updatedRaceData.mViewedParticipantIndex)
-        setRaceInformation({id: crypto.randomUUID()});
+        setRaceInformation({
+          id: crypto.randomUUID(),
+          incidentInformation: {
+            numOffTrack: 0,
+            numBigCollision: 0,
+            numSmallCollision: 0,
+            numSpins: 0
+          }
+        });
         setIsRacing(true)
       }
 
@@ -113,6 +162,7 @@ function App(): React.JSX.Element {
     setCurrData(updatedRaceData)
   }, [gameInfo.data])
 
+  // Gets run when isRacing changes, basically when a race is started or finished. But we use this primarily for end race cleanup
   useEffect(() => {
     if (!currData)
       return;
@@ -135,7 +185,6 @@ function App(): React.JSX.Element {
       if (currProfile && currProfile.id && raceInformation) {
         let tempProfile = {...currProfile};
         tempProfile.driverRating += calculatedRatingChange;
-        setCurrProfile(tempProfile)
 
         let tempRaceHistory = {...raceHistory};
 
@@ -163,14 +212,34 @@ function App(): React.JSX.Element {
         {
           tempRaceHistory[currProfile.id] = [tempRaceInformation]
         }
+
+        if (tempRaceInformation.incidentInformation)
+        {
+          let totalIncidentPoints = 0;
+          totalIncidentPoints += tempRaceInformation.incidentInformation.numOffTrack;
+          totalIncidentPoints += tempRaceInformation.incidentInformation.numBigCollision * 4;
+          totalIncidentPoints += tempRaceInformation.incidentInformation.numSpins * 2;
+
+          let calculateSafetyRatingChange = calculateSafetyDelta(
+            totalIncidentPoints, 
+            currData.participants[playerParticipantIndex].mCurrentLap, 
+            currProfile.safetyRating
+          );
+          
+          tempProfile.safetyRating += calculateSafetyRatingChange;
+
+          setCurrProfile(tempProfile);
+        }
+
         
         saveRaceHistory(tempRaceHistory);
         
           
         setRaceHistory(tempRaceHistory);
-        setRaceInformation(undefined);
-        setCurrData(undefined);
       }
+      
+      setRaceInformation(undefined);
+      setCurrData(undefined);
     }
 
     prevIsRacing.current = isRacing

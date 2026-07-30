@@ -38,11 +38,16 @@ interface CarState {
     mLastOpponentCollisionMagnitude: number
 }
 
+interface CarDamage {
+    mCrashState: number;
+}
+
 interface TelemetryData {
     gameStates: GameStates;
     participants: Participants;
     carState: CarState;
     eventInformation: EventInformation;
+    carDamage: CarDamage;
 }
 
 export function useTelemetry(sections: string[], intervalMs: number = 1000) {

@@ -19,3 +19,11 @@ export enum RaceStateValues {
     RACESTATE_DNF = 6,
     RACESTATE_MAX = 7
 }
+
+export enum CrashStateValues {
+    NONE = 0,
+    OFFTRACK = 1,
+    LARGE_PROP = 2,
+    SPINNING = 3,
+    ROLLING = 4
+}

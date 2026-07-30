@@ -1,4 +1,4 @@
-import { ParticipantData, Profile, RatingInformation } from "./interfaces";
+import { ParticipantData, Profile, RatingInformation, SafetyInformation } from "./interfaces";
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -129,5 +129,42 @@ export function returnRatingInformation(rating: number): RatingInformation {
             return { ratingName: "Diamond", ratingColor: "#4FA8F5" }
         default:
             return { ratingName: "Master", ratingColor: "#E63950" }
+    }
+}
+
+export function calculateSafetyDelta(
+    weightedIncidents: number,
+    laps: number,
+    currentSR: number,
+    k: number = 0.2
+): number {
+    const safetyInfo = returnSafetyRatingInformation(currentSR);
+
+    const actualRate = weightedIncidents / laps;
+    const diff = safetyInfo.incidentCount - actualRate;
+
+    if (diff >= 0) {
+        return k * diff;
+    }
+
+    const severityMultiplier = 1 * currentSR / 3;
+    
+    return k * diff * severityMultiplier;
+}
+
+export function returnSafetyRatingInformation(rating: number): SafetyInformation {
+    switch (true) {
+        case rating < 2.0:
+            return { ratingLetter: "R", ratingColor: '#8983A3', incidentCount: 1 };
+        case rating < 3.0:
+            return { ratingLetter: "D", ratingColor: "#E8763C", incidentCount: 0.9 };
+        case rating < 4.0:
+            return { ratingLetter: "C", ratingColor: "#E8B23C", incidentCount: 0.8 };
+        case rating < 5.0:
+            return { ratingLetter: "B", ratingColor: "#D4D43C", incidentCount: 0.6 };
+        case rating < 6.0:
+            return { ratingLetter: "A", ratingColor: "#5FD467", incidentCount: 0.4 };
+        default:
+            return { ratingLetter: "S", ratingColor: "#4FE0D4", incidentCount: 0.2 };
     }
 }
